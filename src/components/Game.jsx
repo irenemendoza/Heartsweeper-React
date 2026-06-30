@@ -27,7 +27,7 @@ function Game() {
         }),
     };
 
-
+    
     return (
         <>
             {!juegoIniciado ? (

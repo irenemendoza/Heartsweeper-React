@@ -5,7 +5,7 @@ function Cell({ row, col, isHeart, heartsCounter, descubierta, onReveal }) {
    
     return (
         <button
-            className='cell'
+            className={`cell ${descubierta ? 'cell-descubierta' : ''}`} 
             style={{ width:'100%', height:'100%'}}
             onClick={() => onReveal(row, col)}>
                 {descubierta && (isHeart ? '❤️' : (heartsCounter > 0 ? heartsCounter : ''))}

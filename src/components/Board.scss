@@ -1,7 +1,7 @@
 #board{
-    border: 2px solid black;
+    border: 2px solid rgba(255,0,0);
     width: fit-content;
     display: grid;
-    grid-template-columns: repeat(var(--dimension), 20px);
-    grid-template-rows: repeat(var(--dimension), 20px);
+    grid-template-columns: repeat(var(--dimension), 30px);
+    grid-template-rows: repeat(var(--dimension), 30px);
 }
