@@ -1,5 +1,6 @@
 import Cell from './Cell.jsx'; 
 import { placeHearts } from "./Hearts.jsx";
+import { numberOfHearts } from "./Hearts.jsx";
 import './Board.scss';
 import { useState } from 'react';
 
@@ -43,22 +44,65 @@ function Board({ dimension, dificultad }) {
         return cells.find((cell) => (cell.row === row && cell.col === col));
     }
     
-    function revealCell(row, col, reveladas = abiertas){
+    function expandirCelda(row, col, reveladas){
         const clave = `${row}-${col}`;
         if (reveladas.has(clave)) return;
         const cell = getCell(row, col);
         if (!cell) return;
         reveladas.add(clave);
-        if (cell.heartsCounter === 0 && !cell.isHeart) {
-            for (let x=-1; x<=1; x++){
-                for (let y=-1; y<=1; y++){
+        if (cell.heartsCounter === 0 && !cell.isHeart){
+            for (let x=-1; x <= 1; x++){
+                for (let y=-1; y <= 1; y++){
                     if (x===0 && y===0) continue;
-                    revealCell(row+x, col+y, reveladas);
+                    expandirCelda(row+x, col+y, reveladas);
                 }
             }
         }
-        setAbiertas(new Set(reveladas));
-    }    
+    }
+
+    function revealCell(row, col){
+        const nuevasReveladas = new Set(abiertas); //copia nueva, no muta el estado original
+        expandirCelda(row, col, nuevasReveladas); //la recursión muta la copia local
+        
+        const cell = getCell(row,col);
+        if (cell && cell.isHeart){
+            revealHearts(nuevasReveladas);
+            setTimeout(()=> {
+                alert("has perdido!");
+            }, 300);
+            
+        };
+
+        setAbiertas(nuevasReveladas); //se guarda el estado final
+        checkwin(nuevasReveladas);
+    }
+    
+    function revealHearts(reveladas){
+        cells.forEach(cell => {
+            if (cell.isHeart){
+                reveladas.add(`${cell.row}-${cell.col}`);
+            }
+        })
+    }
+
+    function checkwin(reveladas){
+        const totalHearts = numberOfHearts({ dimension, dificultad });
+        const totalCells = dimension * dimension;
+        if (reveladas.size === totalCells - totalHearts){
+            const reveladasFinal = new Set(reveladas);
+            cells.forEach(cell => {
+                if (cell.isHeart){
+                    reveladasFinal.add(`${cell.row}-${cell.col}`)
+                }
+            })
+            setAbiertas(reveladasFinal);
+            setTimeout(()=>{
+                alert("Has ganado!")
+            }, 300)
+            
+        }        
+        
+    }
           
     const finalCells = cells.map(cell => <Cell key={`${cell.row}-${cell.col}`} row={cell.row} col={cell.col} isHeart={cell.isHeart} heartsCounter={cell.heartsCounter} descubierta={abiertas.has(`${cell.row}-${cell.col}`)} onReveal={revealCell}/>)
     
