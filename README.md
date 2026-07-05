@@ -8,7 +8,9 @@ Proyecto de aprendizaje de React desarrollado desde cero.
 
 <div align="center">
   <img src="docs/screenshot-inicio.png" alt="Pantalla de inicio" />
+  <p>Pantalla de inicio</p>
   <img src="docs/screenshot-juego.png" alt="Pantalla en curso" />
+  <p>Pantalla de juego</p>
 </div>
 
 ## Características
