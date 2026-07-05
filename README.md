@@ -6,8 +6,10 @@ Proyecto de aprendizaje de React desarrollado desde cero.
 
 ## Captura de pantalla
 
-![Pantalla de inicio](docs/screenshot-inicio.png)
-![Pantalla en curso](docs/screenshot-juego.png)
+<div align="center">
+  <img src="docs/screenshot-inicio.png" alt="Pantalla de inicio" />
+  <img src="docs/screenshot-juego.png" alt="Pantalla en curso" />
+</div>
 
 ## Características
 
