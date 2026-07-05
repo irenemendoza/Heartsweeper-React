@@ -1,11 +1,11 @@
 export function numberOfHearts({ dimension, dificultad}) {
     let porcentaje;
     let totalHearts;
-    if (dificultad === "facil"){
+    if (dificultad === "Fácil"){
         porcentaje = 0.1;
-    } else if (dificultad === "intermedio"){
+    } else if (dificultad === "Intermedio"){
         porcentaje = 0.14;
-    } else if (dificultad === "dificil"){
+    } else if (dificultad === "Difícil"){
         porcentaje = 0.18
     }
 
