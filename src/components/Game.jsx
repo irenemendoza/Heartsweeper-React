@@ -1,13 +1,29 @@
 import Board from './Board.jsx';
+import Button from './Button.jsx';
 import Select from 'react-select';
-import { useState } from 'react';
+import Timer from './Timer.jsx';
+import Ranking from './Ranking.jsx';
+import Modal from './Modal.jsx';
+import { useState, useEffect } from 'react';
+import './Game.scss';
+
 
 function Game() {
     const [dimension, setDimension] = useState('');
     const [dificultad, setDificultad] = useState('');
     const [juegoIniciado, setJuegoIniciado] = useState(false);
+    const [boardKey, setBoardKey] = useState(0);
+    const [timerKey, setTimerKey] = useState(0);
+    const [timerActivo, setTimerActivo] = useState(false);
+    const [juegoTerminado, setJuegoTerminado] = useState(false);
+    const [segundos, setSegundos] = useState(0);
+    const [rankingActual, setRankingActual] = useState([]);
+    const [tipo, setTipo] = useState(null);
 
-
+    
+    // Estado que guarda las celdas abiertas en forma de set con las coordenadas
+    const [abiertas, setAbiertas] = useState(new Set());
+    
     const iniciarJuego = () => {
         if (dimension && dificultad){
             setJuegoIniciado(true);
@@ -27,11 +43,49 @@ function Game() {
         }),
     };
 
-    
+    // Función para iniciar nuevo juego
+    function reiniciarJuego(){
+        if (dimension && dificultad) {
+            setAbiertas(new Set());
+            setTimerActivo(false);
+            setJuegoIniciado(true);
+            setTimerKey(k => k+1);
+            setBoardKey(k => k+1);
+            setJuegoTerminado(false);
+            setTipo(null);
+        }
+    };
+
+    // Función para reiniciar nuevo juego
+    function nuevoJuego(){
+        setAbiertas(new Set());
+        setJuegoIniciado(false);
+        setTimerActivo(false);
+        setJuegoTerminado(false);
+        setTimerKey(k => k+1);
+        setTipo(null);
+    }
+
+    // Guardado de los mejores tiempos
+    function guardarTiempo(nombre){
+        const clave = `${dimension}x${dimension} - ${dificultad}`;
+        const ranking = JSON.parse(localStorage.getItem(clave) || '[]');
+        ranking.push({ nombre, tiempo: segundos, fecha: new Date().toLocaleDateString()});
+        ranking.sort((a,b) => a.tiempo - b.tiempo);
+        const top5 = ranking.slice(0,5);
+        localStorage.setItem(clave, JSON.stringify(top5));
+        setRankingActual(top5);
+    }
+
+    useEffect(() => {
+        const clave = `${dimension}x${dimension} - ${dificultad}`;
+        const ranking = JSON.parse(localStorage.getItem(clave) || '[]'); 
+        setRankingActual(ranking);
+    }, [dimension, dificultad]);
+
     return (
         <>
             {!juegoIniciado ? (
-                <>
                 <div id='inicioJuego'>
                     <label className="enunciado">
                         <p>Elige una dimensión del juego:</p> 
@@ -51,18 +105,66 @@ function Game() {
                             styles={estilosSelect}
                             id="dificultad"
                             options={[
-                                { value:"facil", label:"Fácil"},
-                                { value:"intermedio", label:"Intermedio"},
-                                { value:"dificil", label:"Difícil"}
+                                { value:"Fácil", label:"Fácil"},
+                                { value:"Intermedio", label:"Intermedio"},
+                                { value:"Difícil", label:"Difícil"}
                             ]}
                             onChange={(option)=>setDificultad(option.value)}/>
                     </label>
                     <button id='nuevoJuego' onClick={iniciarJuego}>Nuevo juego</button>
                 </div>
-                </>) : (<Board dimension={dimension} dificultad={dificultad} />
+                ) : (
+                    <div className='game'>
+                        <Timer
+                            activo={timerActivo}
+                            resetKey={timerKey}
+                            segundos={segundos}
+                            setSegundos={setSegundos}
+                        />
+                        <Board 
+                            key={boardKey} 
+                            dimension={dimension} 
+                            dificultad={dificultad} 
+                            abiertas={abiertas} 
+                            setAbiertas={setAbiertas} 
+                            onPrimerClick={() => setTimerActivo(true)}
+                            onJuegoTerminado={()=> setTimerActivo(false)}
+                            juegoTerminado={juegoTerminado}
+                            setJuegoTerminado={setJuegoTerminado}
+                            onMostrarModal={(tipo)=>setTipo(tipo)}
+                            setTipo={setTipo}
+                        />
+
+                        <div className="buttons">
+                            <Button
+                                onClick={reiniciarJuego}>
+                                Reset
+                            </Button>
+                            <Button 
+                                onClick={nuevoJuego}>
+                                Nuevo juego
+                            </Button>
+                        </div>
+                        <div className='ranking'>
+                            <h2>{dimension}x{dimension} - {dificultad}</h2>
+                            <Ranking puntuaciones={rankingActual}/>
+                        </div>
+                            
+                        {tipo && (
+                            <Modal 
+                                tipo={tipo}
+                                tiempo={segundos}
+                                onCerrar={() => setTipo(null)}
+                                onGuardar={(nombre) => {
+                                    guardarTiempo(nombre);
+                                    setTipo(null);
+                                }}
+                            />
+                        )}
+                    </div>
                 )               
             }
-        </>
+        </>    
     );
 }
 

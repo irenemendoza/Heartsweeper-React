@@ -1,13 +1,24 @@
 import Cell from './Cell.jsx'; 
-import { placeHearts } from "./Hearts.jsx";
-import { numberOfHearts } from "./Hearts.jsx";
+import { placeHearts, numberOfHearts } from "./Hearts.jsx";
 import './Board.scss';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 
-function Board({ dimension, dificultad }) {
-    // Estado que guarda las celdas abiertas en forma de set con las coordenadas
-    const [abiertas, setAbiertas] = useState(new Set());
+function Board({ 
+    dimension, 
+    dificultad, 
+    abiertas, 
+    setAbiertas, 
+    onPrimerClick, 
+    onJuegoTerminado, 
+    juegoTerminado, 
+    setJuegoTerminado, 
+    onMostrarModal, 
+}) {
+    
+    const [ganado, setGanado] = useState(false);
+    const animacionRef = useRef(null);
+    
 
     // Creación de las celdas iniciales del tablero
     const [cells] = useState(() => {
@@ -61,16 +72,18 @@ function Board({ dimension, dificultad }) {
     }
 
     function revealCell(row, col){
+        if (juegoTerminado) return;
+        onPrimerClick();
         const nuevasReveladas = new Set(abiertas); //copia nueva, no muta el estado original
         expandirCelda(row, col, nuevasReveladas); //la recursión muta la copia local
         
         const cell = getCell(row,col);
         if (cell && cell.isHeart){
             revealHearts(nuevasReveladas);
-            setTimeout(()=> {
-                alert("has perdido!");
-            }, 300);
-            
+            onJuegoTerminado();
+            setJuegoTerminado(true);
+            setTimeout(()=> 
+                onMostrarModal('perdido'), 600);
         };
 
         setAbiertas(nuevasReveladas); //se guarda el estado final
@@ -85,6 +98,27 @@ function Board({ dimension, dificultad }) {
         })
     }
 
+    // Animación de corazones
+    function animatedHearts(){
+        const heartEmoji = "❤️";
+        const nHearts = 60;
+        const contenedor = animacionRef.current;
+        if (!contenedor) return;
+
+        for (let i = 0; i < nHearts; i++) {
+            const heart = document.createElement("div");
+            heart.className = "falling-heart";
+            heart.textContent = heartEmoji;
+            heart.style.left = Math.random() * 100 + "%";
+            heart.style.animationDelay = Math.random() * 0.5 + "s";
+            contenedor.appendChild(heart);
+        }
+
+        setTimeout(() => {
+            contenedor.innerHTML = '';
+        }, 3000);
+    }
+
     function checkwin(reveladas){
         const totalHearts = numberOfHearts({ dimension, dificultad });
         const totalCells = dimension * dimension;
@@ -95,27 +129,46 @@ function Board({ dimension, dificultad }) {
                     reveladasFinal.add(`${cell.row}-${cell.col}`)
                 }
             })
+            setGanado(true);
+            setJuegoTerminado(true);
             setAbiertas(reveladasFinal);
+            onJuegoTerminado();
             setTimeout(()=>{
-                alert("Has ganado!")
-            }, 300)
-            
+                animatedHearts();
+                onMostrarModal('ganado');
+            }, 600)    
         }        
-        
     }
           
-    const finalCells = cells.map(cell => <Cell key={`${cell.row}-${cell.col}`} row={cell.row} col={cell.col} isHeart={cell.isHeart} heartsCounter={cell.heartsCounter} descubierta={abiertas.has(`${cell.row}-${cell.col}`)} onReveal={revealCell}/>)
+    const finalCells = cells.map(cell => 
+        <Cell 
+            key={`${cell.row}-${cell.col}`} 
+            row={cell.row} 
+            col={cell.col} 
+            isHeart={cell.isHeart} 
+            heartsCounter={cell.heartsCounter} 
+            descubierta={abiertas.has(`${cell.row}-${cell.col}`)} 
+            onReveal={revealCell}
+            ganado={ganado}
+        />
+    )
     
-    
+    useEffect(() => {
+        if (!juegoTerminado) setGanado(false);
+    }, [juegoTerminado]);
 
     return (
-        <div 
-            id='board'
-            style={{
-                '--dimension': dimension
-            }}>
-            {finalCells}    
-        </div>
+        <>
+            <div ref={animacionRef} className='animacion-overlay'>
+            </div>
+            <div 
+                id='board'
+                style={{
+                    '--dimension': dimension
+                }}>
+                {finalCells}    
+            </div>
+        </>
     )
 };
 
