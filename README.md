@@ -1,16 +1,64 @@
-# React + Vite
+# HeartSweeper ❤️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Versión en React de un buscaminas con temática de corazones. Las minas se sustituyen por corazones: el objetivo es descubrir todas las celdas sin revelar ningún corazón.
 
-Currently, two official plugins are available:
+Proyecto de aprendizaje de React desarrollado desde cero.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Captura de pantalla
 
-## React Compiler
+![Pantalla de inicio](docs/screenshot-inicio.png)
+![Pantalla en curso](docs/screenshot-juego.png)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Características
 
-## Expanding the ESLint configuration
+- Tablero configurable: dimensión 8×8 o 16×16
+- Tres niveles de dificultad: Fácil (10%), Intermedio (14%), Difícil (18%) de corazones
+- Revelado en cascada de celdas vacías (flood fill recursivo)
+- Cronómetro que arranca con el primer click y se detiene al finalizar la partida
+- Modal de resultado con corazones rotos 💔 al perder o corazones enteros ❤️ al ganar
+- Animación de corazones cayendo al ganar
+- Ranking de mejores tiempos por combinación de dimensión y dificultad (persistido en localStorage)
+- Botones Reiniciar (nuevo tablero, mismas opciones) y Nuevo juego (vuelve a la selección)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tecnologías
+
+- React 19
+- Vite
+- Sass (SCSS)
+- react-select
+
+## Estructura del proyecto
+
+```
+src/
+├── components/
+│   ├── Board.jsx       # Lógica del tablero: generación, flood fill, detección de victoria/derrota
+│   ├── Cell.jsx        # Celda individual del tablero
+│   ├── Game.jsx        # Estado global: dimensión, dificultad, timer, ranking, modal
+│   ├── Hearts.jsx      # Utilidades: colocación y conteo de corazones
+│   ├── Timer.jsx       # Cronómetro controlado desde Game
+│   ├── Modal.jsx       # Popup de resultado con guardado de puntuación
+│   ├── Ranking.jsx     # Tabla de mejores tiempos
+│   └── Button.jsx      # Botón reutilizable
+├── utils.js            # formatearTiempo (compartido entre Timer, Modal y Ranking)
+└── App.jsx
+```
+
+## Instalación y uso
+
+```bash
+npm install
+npm run dev
+```
+
+## Conceptos de React aplicados
+
+- `useState` y `useEffect` en múltiples componentes
+- `useRef` para el contenedor de la animación de corazones
+- Lifting state: `abiertas`, `segundos`, `juegoTerminado` y `rankingActual` elevados a `Game`
+- Renderizado de listas con `key`
+- Formularios controlados (input de nombre en el Modal)
+- Patrón `key` para forzar remontaje de componentes (`boardKey`)
+- Inicializador lazy de `useState` para la generación del tablero
+- Separación de lógica pura (`expandirCelda`) y actualizaciones de estado (`revealCell`)
+- CSS custom properties desde JSX (`--dimension`) para el grid dinámico
