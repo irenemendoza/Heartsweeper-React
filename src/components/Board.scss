@@ -1,7 +1,24 @@
 #board{
     border: 2px solid rgba(255,0,0);
+    border-radius: 5px;
     width: fit-content;
     display: grid;
     grid-template-columns: repeat(var(--dimension), 30px);
     grid-template-rows: repeat(var(--dimension), 30px);
+}
+
+.falling-heart {
+    position: fixed;
+    top: -50px;
+    font-size: 3rem;
+    animation: fall 2.5s linear forwards;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh);
+        opacity: 0;
+    }
 }
