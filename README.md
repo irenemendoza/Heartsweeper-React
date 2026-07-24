@@ -21,7 +21,7 @@ Proyecto de aprendizaje de React desarrollado desde cero.
 - Cronómetro que arranca con el primer click y se detiene al finalizar la partida
 - Modal de resultado con corazones rotos 💔 al perder o corazones enteros ❤️ al ganar
 - Animación de corazones cayendo al ganar
-- Ranking de mejores tiempos por combinación de dimensión y dificultad (persistido en localStorage)
+- Ranking de mejores tiempos por combinación de dimensión y dificultad, con una API propia en Cloudflare Workers para conservar las puntuaciones al jugar desde diferentes dispositivos
 - Botones Reiniciar (nuevo tablero, mismas opciones) y Nuevo juego (vuelve a la selección)
 
 ## Tecnologías
@@ -30,6 +30,7 @@ Proyecto de aprendizaje de React desarrollado desde cero.
 - Vite
 - Sass (SCSS)
 - react-select
+- Cloudflare Workers (API del ranking)
 
 ## Estructura del proyecto
 
@@ -44,9 +45,15 @@ src/
 │   ├── Modal.jsx       # Popup de resultado con guardado de puntuación
 │   ├── Ranking.jsx     # Tabla de mejores tiempos
 │   └── Button.jsx      # Botón reutilizable
+├── api/
+│   └── scoresApi.js    # Llamadas a la API de ranking (Cloudflare Workers)
 ├── utils.js            # formatearTiempo (compartido entre Timer, Modal y Ranking)
 └── App.jsx
 ```
+
+## Ranking online
+
+El ranking de mejores tiempos no se guarda en localStorage, sino en una API propia desplegada en **Cloudflare Workers**. La app hace peticiones HTTP (`fetch`) a esta API para guardar (`POST /api/scores`) y consultar (`GET /api/scores`) las puntuaciones, filtradas por dimensión y dificultad. De esta forma el ranking es compartido y persiste independientemente del dispositivo o navegador desde el que se juegue.
 
 ## Instalación y uso
 
