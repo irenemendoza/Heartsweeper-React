@@ -6,6 +6,8 @@ import Ranking from './Ranking.jsx';
 import Modal from './Modal.jsx';
 import { useState, useEffect } from 'react';
 import './Game.scss';
+import { getTopScores, saveScore } from '../api/scoresApi.js';
+
 
 
 function Game() {
@@ -67,21 +69,50 @@ function Game() {
     }
 
     // Guardado de los mejores tiempos
-    function guardarTiempo(nombre){
-        const clave = `${dimension}x${dimension} - ${dificultad}`;
-        const ranking = JSON.parse(localStorage.getItem(clave) || '[]');
-        ranking.push({ nombre, tiempo: segundos, fecha: new Date().toLocaleDateString()});
-        ranking.sort((a,b) => a.tiempo - b.tiempo);
-        const top5 = ranking.slice(0,5);
-        localStorage.setItem(clave, JSON.stringify(top5));
-        setRankingActual(top5);
+    async function guardarTiempo(nombre){
+        try {
+            await saveScore ({
+                dimension,
+                dificultad,
+                nombre,
+                time_ms: segundos * 1000
+            });
+            // Recarga del ranking
+            const top5 = await getTopScores({
+                dimension,
+                dificultad
+            });
+            setRankingActual(top5);
+        } catch (error){
+            console.error('Error al guardar la puntuación', error)
+        }
+        
+        
     }
 
+    // Carga del ranking al cambiar la dimensión/dificultad
     useEffect(() => {
-        const clave = `${dimension}x${dimension} - ${dificultad}`;
-        const ranking = JSON.parse(localStorage.getItem(clave) || '[]'); 
-        setRankingActual(ranking);
+        if (!dimension || !dificultad) return;
+
+        async function cargarRanking(){
+            try {
+                const top5 = await getTopScores({
+                    dimension, 
+                    dificultad
+                });
+                setRankingActual(top5);
+            } catch (error){
+            console.error('Error al guardar la puntuación', error)
+            }
+        }
+        cargarRanking();
     }, [dimension, dificultad]);
+
+        
+        
+    
+
+    
 
     return (
         <>
