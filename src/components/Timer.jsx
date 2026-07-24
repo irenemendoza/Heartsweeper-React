@@ -1,11 +1,11 @@
-import React, {  useEffect } from 'react';
+import {  useEffect } from 'react';
 import { formatearTiempo } from '../utils.js';
 
 function Timer({ activo, resetKey, segundos, setSegundos }) {
     
     useEffect(() => {
         setSegundos(0);
-    }, [resetKey]);
+    }, [resetKey, setSegundos]);
 
     useEffect(() => {
         if (!activo) return;
@@ -13,7 +13,7 @@ function Timer({ activo, resetKey, segundos, setSegundos }) {
             setSegundos(s => s+1);
         }, 1000);
         return () => clearInterval(intervalo);
-    }, [activo]);
+    }, [activo, setSegundos]);
 
     
     return(
