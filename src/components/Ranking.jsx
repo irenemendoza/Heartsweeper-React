@@ -20,9 +20,9 @@ function Ranking({ puntuaciones }) {
                     {puntuaciones.map((puntuacion, index)=>(
                         <tr key={index}>
                             <td>{index+1}</td>
-                            <td>{puntuacion.nombre}</td>
-                            <td>{formatearTiempo(puntuacion.tiempo)}</td>
-                            <td>{puntuacion.fecha}</td>
+                            <td>{puntuacion.player_name}</td>
+                            <td>{formatearTiempo(Math.round(puntuacion.time_ms/1000))}</td>
+                            <td>{new Date(puntuacion.created_at).toLocaleDateString()}</td>
                         </tr>
                     )   
                     )}
