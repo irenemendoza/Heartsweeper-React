@@ -4,6 +4,8 @@ Versión en React de un buscaminas con temática de corazones. Las minas se sust
 
 Proyecto de aprendizaje de React desarrollado desde cero.
 
+Desplegado en Vercel: [heartsweeper.irenemendoza.dev](https://heartsweeper.irenemendoza.dev)
+
 ## Captura de pantalla
 
 <div align="center">
@@ -55,6 +57,8 @@ src/
 
 El ranking de mejores tiempos no se guarda en localStorage, sino en una API propia desplegada en **Cloudflare Workers**. La app hace peticiones HTTP (`fetch`) a esta API para guardar (`POST /api/scores`) y consultar (`GET /api/scores`) las puntuaciones, filtradas por dimensión y dificultad. De esta forma el ranking es compartido y persiste independientemente del dispositivo o navegador desde el que se juegue.
 
+Si el guardado falla (por ejemplo, por un problema de red o de disponibilidad del Worker), el Modal muestra un aviso de error sin cerrarse, permitiendo reintentar el guardado antes de continuar.
+
 ## Instalación y uso
 
 ```bash
@@ -73,3 +77,4 @@ npm run dev
 - Inicializador lazy de `useState` para la generación del tablero
 - Separación de lógica pura (`expandirCelda`) y actualizaciones de estado (`revealCell`)
 - CSS custom properties desde JSX (`--dimension`) para el grid dinámico
+- Manejo de errores en llamadas asíncronas (`try/catch` con `fetch`) y estado de error (`errorGuardado`) para dar feedback al usuario sin perder su puntuación
