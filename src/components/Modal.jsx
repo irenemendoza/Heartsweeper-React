@@ -3,7 +3,7 @@ import './Modal.scss';
 import { formatearTiempo } from '../utils.js';
 import Button from './Button.jsx';
 
-function Modal({ tipo, tiempo, onCerrar, onGuardar }) {
+function Modal({ tipo, tiempo, errorGuardado, onCerrar, onGuardar }) {
     const [nombre, setNombre] = useState('Anónimo');
 
     return(
@@ -28,6 +28,12 @@ function Modal({ tipo, tiempo, onCerrar, onGuardar }) {
                         onClick={() => onGuardar(nombre)}>
                         Guardar puntuación
                     </Button>
+                    {errorGuardado && 
+                        <div className='error'>
+                            <p>Ups! Algo no fue bien.</p> 
+                            <p>Vuelve a intentar guardar tu puntuación.</p>
+                        </div>
+                    }
                     </>
                 )}
                 <Button

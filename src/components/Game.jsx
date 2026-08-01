@@ -21,6 +21,7 @@ function Game() {
     const [segundos, setSegundos] = useState(0);
     const [rankingActual, setRankingActual] = useState([]);
     const [tipo, setTipo] = useState(null);
+    const [errorGuardado, setErrorGuardado] = useState(false);
 
     
     // Estado que guarda las celdas abiertas en forma de set con las coordenadas
@@ -70,6 +71,7 @@ function Game() {
 
     // Guardado de los mejores tiempos
     async function guardarTiempo(nombre){
+        setErrorGuardado(false);
         try {
             await saveScore ({
                 dimension,
@@ -83,11 +85,12 @@ function Game() {
                 dificultad
             });
             setRankingActual(top5);
+            return true;
         } catch (error){
             console.error('Error al guardar la puntuación', error)
+            setErrorGuardado(true)
+            return false;
         }
-        
-        
     }
 
     // Carga del ranking al cambiar la dimensión/dificultad
@@ -102,7 +105,7 @@ function Game() {
                 });
                 setRankingActual(top5);
             } catch (error){
-            console.error('Error al guardar la puntuación', error)
+            console.error('Error al cargar el ranking', error)
             }
         }
         cargarRanking();
@@ -185,10 +188,11 @@ function Game() {
                             <Modal 
                                 tipo={tipo}
                                 tiempo={segundos}
+                                errorGuardado={errorGuardado}
                                 onCerrar={() => setTipo(null)}
-                                onGuardar={(nombre) => {
-                                    guardarTiempo(nombre);
-                                    setTipo(null);
+                                onGuardar={async (nombre) => {
+                                    const guardado = await guardarTiempo(nombre);
+                                    if (guardado) setTipo(null);
                                 }}
                             />
                         )}
